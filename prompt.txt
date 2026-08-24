@@ -1,7 +1,7 @@
 Build a complete production-ready multiplayer browser drawing-and-guessing game inspired by the gameplay architecture of Skribbl.io, but with completely original UI, branding, code, and visual design.
 
 IMPORTANT:
-This is NOT a serverless application. The backend must run as a persistent Node.js process.
+This is NOT a serverless application. The backend must run as a persistent Node.js process
 
 ==================================================
 1. TECHNOLOGY STACK
