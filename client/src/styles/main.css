@@ -45,9 +45,9 @@
 }
 
 html, body, #root {
-  height: 100%;
-  max-height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 body {
@@ -163,9 +163,7 @@ h1, h2, h3, h4, h5, h6, .display-font {
 
 /* APP CONTAINER */
 .app-container {
-  height: 100vh;
-  max-height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }

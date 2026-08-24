@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
-import { LogIn, PlusCircle, Play, Sparkles, Sun, Moon } from 'lucide-react';
+import { LogIn, PlusCircle, Play, Sparkles, Sun, Moon, ArrowLeft } from 'lucide-react';
 
 const AVATAR_COLORS = [
   '#FFE600', // Yellow
@@ -13,7 +13,7 @@ const AVATAR_COLORS = [
   '#FFFFFF', // White
 ];
 
-export const HomePage = () => {
+export const HomePage = ({ onReturnToLanding }) => {
   const { createRoom, joinRoom, errorMessage, isConnected } = useGame();
   
   const [nickname, setNickname] = useState('');
@@ -63,6 +63,19 @@ export const HomePage = () => {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', position: 'relative' }}>
       
+      {/* RETURN TO LANDING BUTTON AT TOP LEFT */}
+      {onReturnToLanding && (
+        <button
+          type="button"
+          className="btn-brutal btn-white btn-sm"
+          onClick={onReturnToLanding}
+          style={{ position: 'absolute', top: '1.5rem', left: '1.5rem' }}
+          title="Return to Landing Page"
+        >
+          <ArrowLeft size={18} /> HOME
+        </button>
+      )}
+
       {/* THEME TOGGLE BUTTON AT TOP RIGHT */}
       <button
         type="button"
@@ -80,13 +93,13 @@ export const HomePage = () => {
         {/* HEADER BRANDING */}
         <div style={{ textAlign: 'center', marginBottom: '1.5rem', position: 'relative' }}>
           <div className="badge-brutal" style={{ backgroundColor: 'var(--neon-pink)', color: '#FFF', transform: 'rotate(-2deg)', marginBottom: '0.5rem' }}>
-            MULTIPLAYER DRAWING GAME
+            THE RESENTMENT // FREESTYLE MODE
           </div>
-          <h1 style={{ fontSize: '2.8rem', letterSpacing: '-1px', lineHeight: '1' }}>
-            SKRIBBLE
+          <h1 style={{ fontSize: '2.5rem', letterSpacing: '-1px', lineHeight: '1' }}>
+            THE RESENTMENT
           </h1>
           <p style={{ fontWeight: '600', opacity: 0.8, marginTop: '0.5rem', fontSize: '0.9rem' }}>
-            DRAW FAST. GUESS FASTER. NO MERCY.
+            FREESTYLE DRAWING LOBBY
           </p>
         </div>
 
