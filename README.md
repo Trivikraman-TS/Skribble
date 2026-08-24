@@ -1,4 +1,4 @@
-# 🎨 SKRIBBLE.BRUTAL // Multiplayer Drawing & Guessing Game
+# SKRIBBLE.BRUTAL // Multiplayer Drawing & Guessing Game
 
 > A production-ready real-time multiplayer browser drawing-and-guessing game built with React, Node.js, Socket.IO, and a high-contrast **Neo-Brutalist Visual Design System**.
 
@@ -6,20 +6,6 @@
 
 ## 📐 Architecture Overview
 
-```mermaid
-graph TD
-    ClientA[React Client (Player 1)] <-->|Socket.IO Events| Server[Node.js + Express Backend]
-    ClientB[React Client (Player 2)] <-->|Socket.IO Events| Server
-    ClientC[React Client (Player 3)] <-->|Socket.IO Events| Server
-
-    subgraph Backend Architecture
-        Server --> GM[GameManager]
-        GM --> RM[RoomManager]
-        RM --> GR[GameRoom State Machine]
-        GR --> WM[WordManager]
-        GR --> SM[ScoreManager]
-    end
-```
 
 ### Event Sequence Diagram
 
@@ -54,7 +40,7 @@ sequenceDiagram
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 | Domain | Technologies |
 | :--- | :--- |
@@ -65,7 +51,7 @@ sequenceDiagram
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 /
@@ -100,7 +86,7 @@ sequenceDiagram
 
 ---
 
-## ⚡ Local Development Setup
+## Local Development Setup
 
 ### 1. Install Dependencies
 Run the install command from the project root:
@@ -167,7 +153,7 @@ npm run dev
 
 ---
 
-## 🚀 Deployment Guide
+## Deployment Guide
 
 ### Backend → Render Deployment (Web Service)
 
@@ -195,7 +181,7 @@ npm run dev
 
 ---
 
-## 🛡️ Security & Validation Measures
+## Security & Validation Measures
 
 - **Server-Authoritative State**: Scores, secret word, current drawer, turn rotation, and timers exist only on the server.
 - **Drawer Verification**: Drawing socket events are validated server-side to ensure only the designated drawer can draw or edit the canvas.
