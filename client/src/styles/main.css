@@ -1,0 +1,192 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Space+Grotesk:wght@500;700;900&display=swap');
+
+:root {
+  --bg-cream: #F4F0EA;
+  --bg-card: #FFFFFF;
+  --color-text: #000000;
+  --color-muted: #555555;
+  --border-color: #000000;
+  --shadow-color: #000000;
+  --card-subtle-bg: #FFFDF0;
+  
+  /* Brutalist Neon Palette */
+  --neon-yellow: #FFE600;
+  --neon-green: #00FF66;
+  --neon-pink: #FF0055;
+  --neon-cyan: #00E5FF;
+  --neon-orange: #FF5C00;
+  --neon-purple: #B537FF;
+
+  --border-thick: 4px solid var(--border-color);
+  --border-thin: 2px solid var(--border-color);
+  --shadow-hard: 5px 5px 0px var(--shadow-color);
+  --shadow-hard-lg: 8px 8px 0px var(--shadow-color);
+  --shadow-hard-sm: 3px 3px 0px var(--shadow-color);
+
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'Courier New', Courier, monospace;
+}
+
+:root[data-theme="dark"], html[data-theme="dark"], body[data-theme="dark"], [data-theme="dark"] {
+  --bg-cream: #121212;
+  --bg-card: #1E1E24;
+  --color-text: #F4F4F5;
+  --color-muted: #A1A1AA;
+  --border-color: #52525B;
+  --shadow-color: #000000;
+  --card-subtle-bg: #27272A;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+body {
+  background-color: var(--bg-cream);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  line-height: 1.4;
+  user-select: none;
+}
+
+h1, h2, h3, h4, h5, h6, .display-font {
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  color: var(--color-text);
+}
+
+/* BRUTALIST BUTTONS */
+.btn-brutal {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  padding: 0.6rem 1.2rem;
+  background-color: var(--neon-yellow);
+  color: #000000;
+  border: var(--border-thick);
+  box-shadow: var(--shadow-hard);
+  cursor: pointer;
+  outline: none;
+  transition: all 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  user-select: none;
+  border-radius: 2px;
+}
+
+.btn-brutal:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 3px 3px 0px var(--shadow-color);
+}
+
+.btn-brutal:active {
+  transform: translate(5px, 5px);
+  box-shadow: 0px 0px 0px var(--shadow-color);
+}
+
+.btn-brutal:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: var(--shadow-hard);
+}
+
+.btn-primary { background-color: var(--neon-yellow); color: #000; }
+.btn-cyan { background-color: var(--neon-cyan); color: #000; }
+.btn-pink { background-color: var(--neon-pink); color: #FFF; }
+.btn-green { background-color: var(--neon-green); color: #000; }
+.btn-orange { background-color: var(--neon-orange); color: #FFF; }
+.btn-white { background-color: var(--bg-card); color: var(--color-text); }
+.btn-sm { padding: 0.35rem 0.7rem; font-size: 0.8rem; }
+.btn-lg { padding: 0.9rem 1.8rem; font-size: 1.15rem; }
+
+/* BRUTALIST CARDS / PANELS */
+.card-brutal {
+  background-color: var(--bg-card);
+  color: var(--color-text);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-hard);
+  padding: 1.25rem;
+  border-radius: 2px;
+}
+
+.card-brutal-lg {
+  box-shadow: var(--shadow-hard-lg);
+  padding: 1.75rem;
+}
+
+/* BRUTALIST INPUTS */
+.input-brutal {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.6rem 0.9rem;
+  border: var(--border-thick);
+  background-color: var(--bg-card);
+  color: var(--color-text);
+  outline: none;
+  width: 100%;
+  border-radius: 2px;
+}
+
+.input-brutal:focus {
+  border-color: var(--neon-yellow);
+  box-shadow: var(--shadow-hard-sm);
+}
+
+/* BRUTALIST BADGES */
+.badge-brutal {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border: var(--border-thin);
+  background-color: var(--neon-cyan);
+  color: #000000;
+  display: inline-block;
+  text-transform: uppercase;
+}
+
+/* APP CONTAINER */
+.app-container {
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* UTILS */
+.text-center { text-align: center; }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-4 { gap: 1rem; }
+.w-full { width: 100%; }
+
+/* ANIMATIONS */
+@keyframes popIn {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-pop {
+  animation: popIn 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}

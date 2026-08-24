@@ -1,0 +1,890 @@
+Build a complete production-ready multiplayer browser drawing-and-guessing game inspired by the gameplay architecture of Skribbl.io, but with completely original UI, branding, code, and visual design.
+
+IMPORTANT:
+This is NOT a serverless application. The backend must run as a persistent Node.js process.
+
+==================================================
+1. TECHNOLOGY STACK
+==================================================
+
+Frontend:
+- React.js
+- Vite
+- HTML5 Canvas
+- CSS
+- Socket.IO client
+
+Backend:
+- Node.js
+- Express.js
+- Socket.IO
+- JavaScript
+- In-memory server-side room/game state
+
+Game logic:
+- Implement as separate backend modules/services.
+- Do NOT put all game logic directly inside Express route handlers.
+- Express is responsible for HTTP/API functionality.
+- Socket.IO is responsible for real-time multiplayer communication.
+- The server must be authoritative for all game state, scores, turns, timers, secret words, and guesses.
+
+Room management:
+- Server-side room management.
+- Rooms should exist in backend memory.
+- Each room should have a unique room code.
+- Players join rooms using the room code.
+- A player can only belong to one active room at a time.
+
+Deployment:
+Frontend → Vercel
+Backend → Render
+Backend must be a persistent Web Service on Render.
+DO NOT use Vercel serverless functions.
+DO NOT use Render static hosting for the backend.
+DO NOT introduce AWS Lambda, Firebase Functions, Supabase Edge Functions, etc.
+
+==================================================
+2. PROJECT STRUCTURE
+==================================================
+
+Create a clean monorepo-style structure:
+
+/
+├── client/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── hooks/
+│   │   ├── context/
+│   │   ├── services/
+│   │   ├── game/
+│   │   ├── styles/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── public/
+│   ├── package.json
+│   ├── vite.config.js
+│   └── .env.example
+│
+├── server/
+│   ├── src/
+│   │   ├── config/
+│   │   ├── controllers/
+│   │   ├── game/
+│   │   │   ├── GameManager.js
+│   │   │   ├── GameRoom.js
+│   │   │   ├── Player.js
+│   │   │   ├── GameState.js
+│   │   │   ├── WordManager.js
+│   │   │   └── ScoreManager.js
+│   │   ├── sockets/
+│   │   │   ├── socketHandler.js
+│   │   │   ├── roomEvents.js
+│   │   │   ├── gameEvents.js
+│   │   │   └── drawingEvents.js
+│   │   ├── rooms/
+│   │   │   └── RoomManager.js
+│   │   ├── routes/
+│   │   ├── middleware/
+│   │   ├── utils/
+│   │   ├── words/
+│   │   ├── app.js
+│   │   └── server.js
+│   ├── package.json
+│   └── .env.example
+│
+├── README.md
+└── .gitignore
+
+Keep the architecture modular and easy to extend.
+
+==================================================
+3. GAME CONCEPT
+==================================================
+
+Implement the following game flow:
+
+1. User opens the frontend.
+2. User can:
+   - Create a room
+   - Join an existing room
+3. Creating a room generates a short unique room code.
+4. User enters a nickname.
+5. Players join the room.
+6. Lobby displays all connected players.
+7. Host can start the game.
+8. Server selects the first drawer.
+9. Drawer receives 3 word choices.
+10. Drawer chooses one word.
+11. Other players must NOT receive the secret word.
+12. Drawing round starts.
+13. Drawer draws on the canvas.
+14. Drawing events are sent through Socket.IO.
+15. Server broadcasts drawing events to the other players in the room.
+16. Other players submit guesses.
+17. Server validates guesses.
+18. Correct guessers receive points.
+19. Faster correct guesses should receive more points.
+20. Drawer receives points based on how many players successfully guess.
+21. Round ends when:
+   - Timer reaches zero, OR
+   - Everyone except the drawer has correctly guessed.
+22. Reveal the word.
+23. Display round scores.
+24. Next player becomes drawer.
+25. Continue for configurable number of rounds.
+26. Display final scoreboard.
+27. Allow players to play again or return to lobby.
+
+==================================================
+4. SERVER AUTHORITATIVE ARCHITECTURE
+==================================================
+
+The server must be authoritative.
+
+Never trust the frontend for:
+
+- Scores
+- Secret word
+- Current drawer
+- Round number
+- Timer
+- Guess correctness
+- Game status
+- Player permissions
+
+The client should only send intentions/actions.
+
+For example:
+
+BAD:
+client sends:
+{
+  score: 500
+}
+
+GOOD:
+client sends:
+{
+  type: "submit_guess",
+  guess: "apple"
+}
+
+Then the server determines the result.
+
+==================================================
+5. ROOM MODEL
+==================================================
+
+Create a GameRoom class/model containing:
+
+- roomId
+- roomCode
+- hostId
+- players
+- gameState
+- currentDrawerId
+- currentWord
+- wordChoices
+- roundNumber
+- totalRounds
+- roundDuration
+- remainingTime
+- drawingData
+- guessedPlayers
+- scores
+- gameStatus
+
+Possible game states:
+
+LOBBY
+CHOOSING_WORD
+DRAWING
+ROUND_END
+GAME_END
+
+Create a RoomManager responsible for:
+
+- createRoom()
+- getRoom()
+- deleteRoom()
+- addPlayer()
+- removePlayer()
+- generateRoomCode()
+- findRoomByPlayer()
+- cleanupEmptyRooms()
+
+==================================================
+6. SOCKET.IO EVENTS
+==================================================
+
+Design clear event names.
+
+Connection:
+
+connection
+disconnect
+
+Room events:
+
+create_room
+join_room
+leave_room
+player_joined
+player_left
+room_state
+
+Game events:
+
+start_game
+choose_word
+game_started
+word_choices
+round_started
+round_ended
+game_ended
+next_round
+
+Drawing events:
+
+drawing_start
+drawing_move
+drawing_end
+clear_canvas
+undo
+change_tool
+
+Guessing events:
+
+submit_guess
+correct_guess
+incorrect_guess
+player_guessed
+
+Chat events:
+
+send_message
+receive_message
+
+Timer:
+
+timer_update
+
+Use server-side validation for every event.
+
+==================================================
+7. DRAWING SYSTEM
+==================================================
+
+Use HTML5 Canvas.
+
+Implement:
+
+- Pencil
+- Eraser
+- Brush size
+- Color picker
+- Clear canvas
+- Undo
+- Redo if practical
+
+Do NOT send canvas screenshots/images continuously.
+
+Transmit drawing operations/strokes through Socket.IO.
+
+A drawing operation should contain enough information to reproduce the stroke, for example:
+
+{
+  type: "stroke",
+  points: [...],
+  color: "#000000",
+  width: 5,
+  tool: "brush"
+}
+
+Optimize network usage.
+
+Do not emit an event for every raw mousemove without throttling/batching.
+
+The server should validate that only the current drawer can submit drawing operations.
+
+When a new player joins an active game, provide the necessary current drawing state so they can synchronize with the existing canvas.
+
+==================================================
+8. WORD SYSTEM
+==================================================
+
+Create a word manager with categories/difficulty support.
+
+Example categories:
+
+Animals
+Food
+Objects
+Places
+Movies
+Technology
+Nature
+Sports
+
+Initially store words locally in the backend.
+
+Make the word system easy to replace later with a database.
+
+The secret word must exist only on the server and the drawer's client.
+
+Never expose the secret word in:
+
+- Public room state
+- Player list events
+- Guess events
+- Browser URL
+- HTML
+- Public API responses
+- Socket events sent to non-drawers
+
+==================================================
+9. SCORING
+==================================================
+
+Implement server-side scoring.
+
+Example scoring:
+
+- Correct guesses receive points based on speed.
+- Earlier correct guesses receive more points.
+- Drawer receives points depending on how many players correctly guessed.
+
+Make scoring logic a separate ScoreManager.
+
+Do not hardcode scoring calculations inside socket handlers.
+
+==================================================
+10. CHAT / GUESS UI
+==================================================
+
+Create a chat panel.
+
+Messages should distinguish between:
+
+- Normal chat
+- Guesses
+- Correct guesses
+- System messages
+
+Example:
+
+Player:
+"Is it a car?"
+
+Player:
+"APPLE"
+
+Server:
+"Player123 guessed correctly!"
+
+Do not reveal the secret word until the round ends.
+
+==================================================
+11. PLAYER EXPERIENCE
+==================================================
+
+The UI should clearly show:
+
+- Player list
+- Player scores
+- Current drawer
+- Timer
+- Round number
+- Word hints
+- Chat/guess area
+- Drawing canvas
+- Drawing controls
+- Game status
+
+The drawer should clearly see:
+
+"You are drawing"
+
+and the three word choices.
+
+Other players should see:
+
+"PlayerName is drawing"
+
+and:
+
+"_ _ _ _ _"
+
+or an equivalent hint representation.
+
+==================================================
+12. BRUTALIST / BRUTALISM UI
+==================================================
+
+The entire application must use a strong modern brutalist visual language.
+
+DO NOT create a generic SaaS dashboard.
+DO NOT use glassmorphism.
+DO NOT use soft gradients.
+DO NOT use excessive rounded cards.
+DO NOT use the typical modern AI-app aesthetic.
+
+Use:
+
+- Heavy black borders
+- Thick 3px–5px borders
+- Hard rectangular panels
+- Sharp corners or very small border radius
+- Large bold typography
+- High contrast
+- Solid blocks of color
+- Offset shadows
+- Raw, playful visual hierarchy
+- Large buttons
+- Chunky controls
+- Strong hover states
+- Slightly chaotic but intentional layout
+- Monospace or bold display typography where appropriate
+
+Suggested visual direction:
+
+Background:
+off-white / warm cream
+
+Primary:
+black
+
+Accent colors:
+bright yellow
+electric blue
+hot pink
+lime green
+orange
+
+Use black text on bright accent blocks.
+
+Buttons should feel physical.
+
+Example:
+
+button {
+  border: 4px solid #000;
+  box-shadow: 6px 6px 0 #000;
+}
+
+On hover:
+- translate slightly
+- reduce shadow
+
+On active:
+- move into the shadow
+
+Cards/panels should use hard shadows rather than blur.
+
+The game should feel like a physical board game mixed with an internet drawing game.
+
+==================================================
+13. RESPONSIVE DESIGN
+==================================================
+
+Desktop should be the primary experience.
+
+Also support:
+
+- Laptop
+- Tablet
+- Mobile
+
+On desktop:
+
+┌──────────────────────────────────────────────┐
+│ HEADER / ROOM / ROUND / TIMER                │
+├─────────────────────────────┬────────────────┤
+│                             │                │
+│                             │ PLAYER LIST    │
+│         CANVAS              │                │
+│                             ├────────────────┤
+│                             │ CHAT / GUESS   │
+│                             │                │
+├─────────────────────────────┴────────────────┤
+│ DRAWING TOOLS                                 │
+└──────────────────────────────────────────────┘
+
+On mobile, rearrange these into a usable vertical layout.
+
+==================================================
+14. FRONTEND ARCHITECTURE
+==================================================
+
+Create reusable React components such as:
+
+HomePage
+CreateRoom
+JoinRoom
+Lobby
+GameRoom
+GameCanvas
+DrawingToolbar
+PlayerList
+PlayerCard
+ScoreBoard
+Timer
+ChatPanel
+WordChooser
+RoundResult
+GameResult
+RoomHeader
+
+Use React Context or an appropriate state-management approach for:
+
+- Socket connection
+- Current room
+- Current player
+- Game state
+
+Avoid putting everything into one giant App.jsx.
+
+==================================================
+15. SOCKET CONNECTION
+==================================================
+
+Frontend should connect using:
+
+VITE_API_URL
+
+Example:
+
+VITE_API_URL=https://your-backend.onrender.com
+
+Never hardcode the production backend URL.
+
+The Socket.IO connection should use the backend URL.
+
+Configure CORS on Express/Socket.IO to allow:
+
+- Local development frontend
+- Production Vercel frontend
+
+Use environment variables for allowed origins.
+
+==================================================
+16. EXPRESS BACKEND
+==================================================
+
+Create:
+
+GET /api/health
+
+Response:
+
+{
+  "status": "ok"
+}
+
+Add proper:
+
+- CORS
+- JSON parsing
+- Error handling
+- Environment configuration
+- Logging
+- Graceful shutdown
+
+The server must listen using:
+
+process.env.PORT
+
+with a local fallback.
+
+Example:
+
+const PORT = process.env.PORT || 5000;
+
+Do NOT hardcode a production port.
+
+==================================================
+17. RENDER DEPLOYMENT
+==================================================
+
+Make the backend directly deployable to Render as a Web Service.
+
+server/package.json must contain a production start script similar to:
+
+"start": "node src/server.js"
+
+The backend must bind to:
+
+0.0.0.0
+
+and use:
+
+process.env.PORT
+
+Create a clear Render deployment section in README.md.
+
+Include:
+
+Build Command:
+npm install
+
+Start Command:
+npm start
+
+or the appropriate commands based on the final repository structure.
+
+Explain required Render environment variables.
+
+==================================================
+18. VERCEL DEPLOYMENT
+==================================================
+
+Make the frontend directly deployable to Vercel.
+
+Create:
+
+client/.env.example
+
+containing:
+
+VITE_API_URL=http://localhost:5000
+
+Explain that production should use:
+
+VITE_API_URL=https://<render-backend-url>
+
+Make sure the Vite production build works correctly.
+
+Do not make the backend serverless.
+
+==================================================
+19. LOCAL DEVELOPMENT
+==================================================
+
+The repository should support:
+
+Frontend:
+npm install
+npm run dev
+
+Backend:
+npm install
+npm run dev
+
+Use nodemon for backend development if appropriate.
+
+Document how to run both servers simultaneously.
+
+==================================================
+20. SECURITY / VALIDATION
+==================================================
+
+Implement basic protections:
+
+- Validate room codes
+- Validate player names
+- Limit nickname length
+- Prevent duplicate player IDs
+- Validate Socket.IO events
+- Only drawer can draw
+- Only drawer can choose a word
+- Prevent players from awarding themselves scores
+- Prevent guessing after round ends
+- Prevent guessing multiple times
+- Prevent unauthorized room actions
+- Sanitize chat messages
+- Limit message length
+- Limit drawing payload size
+- Handle disconnects gracefully
+
+Do not over-engineer authentication for the first version.
+
+Players can join using nickname + room code.
+
+==================================================
+21. DISCONNECT HANDLING
+==================================================
+
+When a player disconnects:
+
+- Remove them from the room if appropriate.
+- Notify remaining players.
+- If the host disconnects, assign a new host.
+- If the drawer disconnects, safely end/restart the round.
+- Clean up empty rooms.
+- Prevent stale timers from continuing indefinitely.
+
+==================================================
+22. GAME TIMERS
+==================================================
+
+Timers must be controlled by the server.
+
+Do NOT trust the client's countdown.
+
+The server should periodically send:
+
+timer_update
+
+The client simply renders the remaining time.
+
+When the server determines that the timer reached zero, it ends the round.
+
+==================================================
+23. CODE QUALITY
+==================================================
+
+Write clean, maintainable code.
+
+Use:
+
+- ES modules or a consistent module system
+- Clear naming
+- Small functions
+- Separation of concerns
+- Reusable React components
+- Comments only where useful
+- No giant files
+- No duplicated game logic
+- No hardcoded production URLs
+- No unnecessary dependencies
+
+==================================================
+24. ERROR / EMPTY STATES
+==================================================
+
+Design brutalist error screens for:
+
+- Room doesn't exist
+- Room is full
+- Invalid nickname
+- Connection lost
+- Server unavailable
+- Game already started
+- Player disconnected
+- Invalid action
+
+Example:
+
+"ROOM NOT FOUND"
+
+with a large black bordered panel and a brutalist button:
+
+"GO HOME"
+
+==================================================
+25. README
+==================================================
+
+Create a comprehensive README explaining:
+
+1. Project overview
+2. Architecture
+3. Technology stack
+4. Folder structure
+5. Local development
+6. Environment variables
+7. Socket.IO events
+8. Game flow
+9. Room architecture
+10. Drawing synchronization
+11. Security considerations
+12. Vercel deployment
+13. Render deployment
+14. Production configuration
+15. Future scaling considerations
+
+Include an architecture diagram using Mermaid.
+
+==================================================
+26. IMPORTANT IMPLEMENTATION RULES
+==================================================
+
+Do NOT create a mock UI with fake multiplayer behavior.
+
+The game must actually work between multiple browser tabs/devices.
+
+Do NOT use localStorage as the multiplayer synchronization mechanism.
+
+Do NOT implement multiplayer using polling.
+
+Use Socket.IO for real-time communication.
+
+Do NOT use a database initially unless absolutely necessary.
+
+Keep active room/game state in the backend server.
+
+Do NOT make the backend serverless.
+
+Make the backend compatible with Render's persistent Web Service model.
+
+Make the frontend compatible with Vercel.
+
+==================================================
+27. DEVELOPMENT PROCESS
+==================================================
+
+Build the application incrementally.
+
+First implement:
+
+1. Project scaffolding
+2. Express server
+3. Socket.IO connection
+4. Room creation
+5. Room joining
+6. Lobby
+7. Player synchronization
+8. Game state
+9. Turn system
+10. Word selection
+11. Canvas drawing synchronization
+12. Guessing
+13. Scoring
+14. Timer
+15. Round transitions
+16. Game completion
+17. Brutalist UI
+18. Responsive layout
+19. Error handling
+20. Deployment configuration
+
+After implementation, test the game using multiple browser tabs.
+
+Specifically verify:
+
+- Two or more players can join the same room.
+- Player list synchronizes.
+- Host can start the game.
+- Drawer selection works.
+- Only drawer receives word choices.
+- Only drawer can draw.
+- Drawing appears on other clients.
+- Guesses synchronize.
+- Correct guesses are detected server-side.
+- Scores synchronize.
+- Timer synchronizes.
+- Rounds transition correctly.
+- Disconnects are handled.
+- Final results appear correctly.
+
+Fix any issues found during testing.
+
+==================================================
+FINAL REQUIREMENT
+==================================================
+
+At the end, provide:
+
+1. Final folder structure
+2. How to run locally
+3. Required environment variables
+4. Exact Vercel deployment steps
+5. Exact Render deployment steps
+6. How to connect the deployed frontend to the deployed backend
+7. List of Socket.IO events
+8. Explanation of the game-state architecture
+9. Known limitations
+10. Suggestions for future scaling
+
+Do not stop after generating the UI. The final result must be a functional multiplayer game that can be deployed and tested with multiple users.
