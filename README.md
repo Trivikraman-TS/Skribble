@@ -4,7 +4,7 @@
 
 ---
 
-## 📐 Architecture Overview
+## Architecture Overview
 
 
 ### Event Sequence Diagram
@@ -122,7 +122,7 @@ npm run dev
 
 ---
 
-## 🔌 Socket.IO Event Reference
+## Socket.IO Event Reference
 
 ### Room Events
 - `create_room` (`client -> server`): Creates a new room and sets host.
@@ -191,7 +191,7 @@ npm run dev
 
 ---
 
-## 💡 Scaling & Future Considerations
+## Scaling & Future Considerations
 
 1. **Redis Adapter**: Integrate `@socket.io/redis-adapter` for multi-instance horizontal scaling across persistent worker nodes.
 2. **Persistent Database**: Add PostgreSQL / MongoDB with Prisma ORM to save user statistics, lifetime leaderboards, and custom word packs.
