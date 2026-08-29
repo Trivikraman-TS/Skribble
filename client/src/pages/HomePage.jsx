@@ -93,10 +93,10 @@ export const HomePage = ({ onReturnToLanding }) => {
         {/* HEADER BRANDING */}
         <div style={{ textAlign: 'center', marginBottom: '1.5rem', position: 'relative' }}>
           <div className="badge-brutal" style={{ backgroundColor: 'var(--neon-pink)', color: '#FFF', transform: 'rotate(-2deg)', marginBottom: '0.5rem' }}>
-            THE RESENTMENT // FREESTYLE MODE
+            SCRIBTURE // FREESTYLE MODE
           </div>
           <h1 style={{ fontSize: '2.5rem', letterSpacing: '-1px', lineHeight: '1' }}>
-            THE RESENTMENT
+            SCRIBTURE
           </h1>
           <p style={{ fontWeight: '600', opacity: 0.8, marginTop: '0.5rem', fontSize: '0.9rem' }}>
             FREESTYLE DRAWING LOBBY

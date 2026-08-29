@@ -54,7 +54,7 @@ export const LandingPage = ({ onEnterFreestyle }) => {
               padding: '0.25rem 0.75rem',
             }}
           >
-            THE RESENTMENT // MULTIPLAYER MODE
+            SCRIBTURE // MULTIPLAYER MODE
           </div>
 
           <h1
@@ -65,7 +65,7 @@ export const LandingPage = ({ onEnterFreestyle }) => {
               marginBottom: '0.4rem',
             }}
           >
-            THE RESENTMENT
+            SCRIBTURE
           </h1>
 
           <h2
@@ -179,7 +179,7 @@ export const LandingPage = ({ onEnterFreestyle }) => {
 
         {/* FOOTER */}
         <footer style={{ borderTop: 'var(--border-thick)', paddingTop: '1.25rem', textAlign: 'center', fontSize: '0.8rem', fontWeight: '700', color: 'var(--color-muted)', marginBottom: '1.5rem' }}>
-          THE RESENTMENT MULTIPLAYER MODE // FREESTYLE EDITION
+          SCRIBTURE MULTIPLAYER MODE // FREESTYLE EDITION
         </footer>
 
       </div>
